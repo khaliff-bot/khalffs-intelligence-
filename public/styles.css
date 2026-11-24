@@ -1,0 +1,269 @@
+:root {
+  --bg: #070b18;
+  --panel: #10182b;
+  --panel-light: #17233b;
+  --blue: #168cff;
+  --blue-glow: #00c8ff;
+  --gold: #e8bd65;
+  --silver: #d8e1ef;
+  --text: #f4f7ff;
+  --muted: #94a3bd;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, #102d55 0, transparent 35%),
+    var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+button, input, textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  padding: 24px 18px;
+  background: rgba(9, 15, 31, .96);
+  border-right: 1px solid rgba(255,255,255,.08);
+}
+
+.logo {
+  color: var(--gold);
+  font-size: 23px;
+  font-weight: 800;
+  margin-bottom: 30px;
+}
+
+.logo span {
+  color: var(--blue-glow);
+}
+
+.new-chat {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--blue);
+  border-radius: 12px;
+  background: #10284a;
+  color: white;
+  margin-bottom: 25px;
+}
+
+.sidebar h4 {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 18px 5px 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.history-item {
+  padding: 11px;
+  color: #c4cee0;
+  border-radius: 9px;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.history-item:hover {
+  background: var(--panel-light);
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  padding: 20px 28px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar h2 {
+  font-size: 19px;
+}
+
+.status {
+  color: #57e5a2;
+  font-size: 12px;
+}
+
+.chat-area {
+  width: min(850px, 100%);
+  margin: 0 auto;
+  padding: 35px 24px;
+  flex: 1;
+}
+
+.welcome {
+  text-align: center;
+  padding: 75px 10px 35px;
+}
+
+.welcome h1 {
+  font-size: clamp(30px, 5vw, 48px);
+  margin-bottom: 14px;
+}
+
+.welcome h1 span {
+  color: var(--blue-glow);
+}
+
+.welcome p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.suggestions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 35px;
+}
+
+.suggestion {
+  text-align: left;
+  padding: 17px;
+  border-radius: 13px;
+  color: var(--silver);
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.suggestion:hover {
+  border-color: var(--blue);
+  background: var(--panel-light);
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.message {
+  max-width: 85%;
+  padding: 15px 18px;
+  border-radius: 15px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.message.user {
+  align-self: flex-end;
+  background: #123d70;
+}
+
+.message.assistant {
+  align-self: flex-start;
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.composer-wrap {
+  padding: 18px 24px 25px;
+  width: min(850px, 100%);
+  margin: 0 auto;
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--panel);
+  border: 1px solid #263b5c;
+  border-radius: 16px;
+  padding: 10px;
+}
+
+.composer textarea {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  max-height: 130px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: white;
+  padding: 10px;
+}
+
+.composer button {
+  border: 0;
+  border-radius: 11px;
+  padding: 12px 16px;
+  color: white;
+  background: linear-gradient(135deg, var(--blue), #0755c7);
+}
+
+.footer-note {
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #17233b;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    display: none;
+  }
+
+  .topbar {
+    padding: 17px;
+  }
+
+  .chat-area {
+    padding: 15px;
+  }
+
+  .welcome {
+    padding-top: 65px;
+  }
+
+  .suggestions {
+    grid-template-columns: 1fr;
+  }
+
+  .composer-wrap {
+    padding: 12px;
+  }
+
+  .message {
+    max-width: 95%;
+  }
+}
