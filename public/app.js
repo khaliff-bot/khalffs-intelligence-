@@ -1,7 +1,7 @@
 /* KI's front end. Set the two Supabase values below before deploying. */
 const SUPABASE_URL = "https://ldromtbmwrdckwgtgvko.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_xwQIgH3LrYVar5Ka4BVvLw_wQ4Auv2g";
-const configReady = SUPABASE_URL.startsWith("https://") && !SUPABASE_PUBLISHABLE_KEY.startsWith("PASTE_");
+const configReady = SUPABASE_URL.startsWith("https://ldromtbmwrdckwgtgvko.supabase.co") && !SUPABASE_PUBLISHABLE_KEY.startsWith("PASTE_");
 const $ = (id) => document.getElementById(id);
 const authScreen = $("auth-screen"), app = $("app"), authForm = $("auth-form");
 let supabase = null, user = null, currentChat = null, conversation = [], authMode = "login";
