@@ -1,17 +1,18 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#080b16">
+  <meta name="description" content="KI's — Khalffs Intelligence. Ask, learn, create and achieve more.">
   <title>KI's — Khalffs Intelligence</title>
   <link rel="stylesheet" href="/style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
 
-  <!-- LOGIN AND SIGNUP -->
+  <!-- LOGIN / SIGNUP -->
   <section id="auth-screen" class="auth-screen">
     <div class="auth-card">
       <div class="brand">
@@ -30,35 +31,22 @@
 
       <form id="auth-form">
         <label for="auth-email">Email address</label>
-        <input
-          id="auth-email"
-          type="email"
-          placeholder="Enter your email"
-          autocomplete="email"
-          required
-        >
+        <input id="auth-email" type="email" placeholder="Enter your email"
+          autocomplete="email" required>
 
         <label for="auth-password">Password</label>
-        <input
-          id="auth-password"
-          type="password"
-          placeholder="Enter your password"
-          autocomplete="current-password"
-          minlength="6"
-          required
-        >
+        <input id="auth-password" type="password" placeholder="Enter your password"
+          autocomplete="current-password" minlength="6" required>
 
-        <button type="submit" id="auth-submit" class="primary-button">
-          Log in
-        </button>
+        <button type="submit" id="auth-submit" class="primary-button">Log in</button>
       </form>
 
       <p id="auth-note" class="auth-note">
         Log in or create your account to continue.
       </p>
+      <p class="creator-credit">Created by Alexander Olaoluwa</p>
     </div>
   </section>
-
 
   <!-- MAIN APPLICATION -->
   <main id="app" class="app hidden">
@@ -73,10 +61,8 @@
             <small>Khalffs Intelligence</small>
           </div>
         </div>
-
-        <button id="theme-toggle" class="icon-button" type="button" title="Change theme">
-          ☼
-        </button>
+        <button id="theme-toggle" class="icon-button" type="button"
+          title="Change theme" aria-label="Change theme">☼</button>
       </div>
 
       <button id="new-chat" class="new-chat-button" type="button">
@@ -98,93 +84,112 @@
         <button id="mobile-theme" class="secondary-button" type="button">
           Toggle theme
         </button>
-
-        <button id="logout" class="logout-button" type="button">
-          Log out
-        </button>
+        <button id="logout" class="logout-button" type="button">Log out</button>
       </div>
     </aside>
 
-
     <!-- CHAT AREA -->
     <section id="chat-area" class="chat-area">
-
       <header class="topbar">
-        <button id="menu-toggle" class="icon-button" type="button" title="Open menu">
-          ☰
-        </button>
+        <button id="menu-toggle" class="icon-button" type="button"
+          title="Open menu" aria-label="Open menu">☰</button>
 
         <div class="topbar-brand">
-          <strong>KI's</strong>
-          <span>AI Assistant</span>
+          <div class="topbar-logo">KI</div>
+          <div>
+            <strong>KI's</strong>
+            <span>Khalffs Intelligence</span>
+          </div>
         </div>
 
         <div class="status-indicator">
-          <span></span> Online
+          <span></span> Ready to help
         </div>
       </header>
 
-
-      <!-- WELCOME SCREEN -->
+      <!-- WELCOME -->
       <div id="welcome" class="welcome">
         <div class="welcome-logo">
           <div class="robot-face">
-            <div class="robot-eyes">
-              <span></span>
-              <span></span>
-            </div>
+            <div class="robot-eyes"><span></span><span></span></div>
             <div class="robot-mouth"></div>
           </div>
         </div>
 
+        <p class="welcome-eyebrow">WELCOME TO KHALFFS INTELLIGENCE</p>
         <h1>How can I help you today?</h1>
-        <p>Ask KI's anything. Let's make something amazing.</p>
+        <p>Ask. Learn. Create. Together.</p>
 
         <div class="suggestion-list">
-          <div class="suggestion">
-            <span>✦</span>
-            <p>Help me learn something new</p>
-          </div>
-          <div class="suggestion">
-            <span>✧</span>
-            <p>Help me with ideas and creativity</p>
-          </div>
-          <div class="suggestion">
-            <span>⌘</span>
-            <p>Help me solve a problem</p>
-          </div>
+          <button class="suggestion" type="button" data-prompt="Help me learn something new.">
+            <span>✦</span> Help me learn something new
+          </button>
+          <button class="suggestion" type="button" data-prompt="Help me brainstorm creative ideas.">
+            <span>✧</span> Explore creative ideas
+          </button>
+          <button class="suggestion" type="button" data-prompt="Help me solve a problem.">
+            <span>⌘</span> Solve a problem
+          </button>
         </div>
-      </div>
 
+        <p class="creator-credit">Created by Alexander Olaoluwa</p>
+      </div>
 
       <!-- MESSAGES -->
-      <div id="chat-messages" class="chat-messages"></div>
+      <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
 
-
-      <!-- MESSAGE INPUT -->
-      <div class="composer-area">
-        <form id="chat-form" class="chat-form">
-          <textarea
-            id="chat-input"
-            rows="1"
-            placeholder="Message KI's..."
-            autocomplete="off"
-            required
-          ></textarea>
-
-          <button id="send-button" type="submit" title="Send message">
-            ↑
-          </button>
-        </form>
-
-        <p class="disclaimer">
-          KI's can make mistakes. Check important information.
-        </p>
+      <!-- SELECTED ATTACHMENTS -->
+      <div id="attachment-preview" class="attachment-preview hidden">
+        <div id="attachment-list" class="attachment-list"></div>
+        <button id="clear-attachments" type="button" class="clear-attachments">
+          Clear attachments
+        </button>
       </div>
 
+      <!-- MESSAGE COMPOSER -->
+      <div class="composer-area">
+        <form id="chat-form" class="chat-form">
+          <div class="composer-tools">
+            <button id="attach-button" class="tool-button" type="button"
+              title="Attach a file" aria-label="Attach a file">＋</button>
+
+            <button id="camera-button" class="tool-button" type="button"
+              title="Take a picture" aria-label="Take a picture">▣</button>
+
+            <button id="video-button" class="tool-button" type="button"
+              title="Upload a video" aria-label="Upload a video">▷</button>
+
+            <button id="mic-button" class="tool-button" type="button"
+              title="Record audio" aria-label="Record audio">🎙</button>
+          </div>
+
+          <textarea id="chat-input" rows="1"
+            placeholder="Message KI's..." autocomplete="off"></textarea>
+
+          <button id="send-button" type="submit" title="Send message"
+            aria-label="Send message">↑</button>
+        </form>
+
+        <!-- Hidden file inputs -->
+        <input id="file-input" class="hidden" type="file"
+          accept="image/*,.pdf,.txt,.doc,.docx,.csv,.xlsx,.pptx">
+
+        <input id="camera-input" class="hidden" type="file"
+          accept="image/*" capture="environment">
+
+        <input id="video-input" class="hidden" type="file"
+          accept="video/*">
+
+        <input id="audio-input" class="hidden" type="file"
+          accept="audio/*">
+
+        <div class="composer-footer">
+          <span>KI's — Khalffs Intelligence</span>
+          <span>AI can make mistakes. Check important information.</span>
+        </div>
+      </div>
     </section>
   </main>
-
 
   <script src="/app.js"></script>
 </body>
