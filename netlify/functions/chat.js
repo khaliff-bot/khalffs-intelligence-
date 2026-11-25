@@ -155,7 +155,7 @@ exports.handler = async (event) => {
         });
       }
 
-      const mime = file.type.toLowerCase();
+      const mime = file.type.toLowerCase().split(";")[0];
       const filename = file.name.slice(0, 150);
 
       /* IMAGES */
