@@ -1,41 +1,13 @@
-const KI_IDENTITY = `
-You are KI's, also known as Khalffs Intelligence.
 
-IDENTITY:
-- Your full name is Khalffs Intelligence.
-- Your short name is KI's.
-- Your creator is Alexander Olaoluwa.
-- You are an AI assistant built for the KI's platform.
-- Your underlying AI technology is powered by OpenAI.
-- Never falsely claim to be a human or an independent AI model.
-
-PERSONALITY:
-- Friendly, intelligent, respectful and confident.
-- Communicate naturally and clearly.
-- Be helpful, patient and thoughtful.
-- Adapt your explanations to the user's level.
-- Admit when you do not know something.
-
-CAPABILITIES:
-- Answer questions and explain topics.
-- Understand and analyze uploaded images.
-- Read and analyze supported documents.
-- Understand supported audio inputs.
-- Analyze supplied video frames and visual content.
-- Help with writing, research, learning and productivity.
-- Never claim to have opened or analyzed a file that you did not receive.
-
-IDENTITY RULE:
-When asked your name, say you are KI's.
-When asked your full name, say Khalffs Intelligence.
-When asked who created you, say Alexander Olaoluwa.
-
-Always represent the KI's brand professionally.
-`;
+/* =========================================
+   KI'S — SECURE CHAT BACKEND
+   Netlify Function
+========================================= */
 
 exports.handler = async (event) => {
   const headers = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    "Cache-Control": "no-store"
   };
 
   const send = (statusCode, data) => ({
@@ -45,43 +17,46 @@ exports.handler = async (event) => {
   });
 
   if (event.httpMethod !== "POST") {
-    return send(405, { error: "Method not allowed" });
+    return send(405, { error: "Method not allowed." });
   }
 
   try {
-    const supabaseUrl = process.env.SUPABASE_URL;
+    if (!event.body || event.body.length > 5_500_000) {
+      return send(413, { error: "The request is too large." });
+    }
 
+    const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey =
       process.env.SUPABASE_ANON_KEY ||
       process.env.SUPABASE_PUBLISHABLE_KEY;
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const openaiKey = process.env.OPENAI_API_KEY;
 
-    const authHeader =
-      event.headers?.authorization ||
-      event.headers?.Authorization;
-
-    if (!supabaseUrl || !supabaseKey || !apiKey) {
+    if (!supabaseUrl || !supabaseKey || !openaiKey) {
+      console.error("Missing server configuration.");
       return send(500, {
-        error: "Server configuration is incomplete."
+        error: "KI's server configuration is incomplete."
       });
     }
 
+    /* VERIFY LOGIN */
+
+    const authHeader =
+      event.headers.authorization ||
+      event.headers.Authorization;
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return send(401, {
-        error: "Please log in first."
-      });
+      return send(401, { error: "Please log in first." });
     }
 
     const token = authHeader.slice(7);
 
-    // Verify Supabase session
     const authResponse = await fetch(
       `${supabaseUrl}/auth/v1/user`,
       {
         headers: {
-          "apikey": supabaseKey,
-          "Authorization": `Bearer ${token}`
+          apikey: supabaseKey,
+          Authorization: `Bearer ${token}`
         }
       }
     );
@@ -92,182 +67,263 @@ exports.handler = async (event) => {
       });
     }
 
-    // Decode request
-    const rawBody = event.isBase64Encoded
-      ? Buffer.from(event.body || "", "base64").toString("utf8")
-      : event.body || "{}";
+    /* READ REQUEST */
 
-    if (Buffer.byteLength(rawBody, "utf8") > 5 * 1024 * 1024) {
-      return send(413, {
-        error: "Your upload is too large. Please use a smaller file."
-      });
+    let body;
+
+    try {
+      body = JSON.parse(event.body);
+    } catch {
+      return send(400, { error: "Invalid request data." });
     }
 
-    const { messages } = JSON.parse(rawBody);
+    const messages = body.messages;
+    const attachments = Array.isArray(body.attachments)
+      ? body.attachments
+      : [];
 
     if (
       !Array.isArray(messages) ||
       messages.length === 0 ||
       messages.length > 20
     ) {
+      return send(400, { error: "Invalid message history." });
+    }
+
+    if (attachments.length > 4) {
       return send(400, {
-        error: "Invalid message history."
+        error: "Please attach no more than four files at once."
       });
     }
 
-    // Validate incoming message content
     const safeMessages = messages
-      .filter(m =>
-        m &&
-        ["user", "assistant"].includes(m.role)
+      .filter(message =>
+        message &&
+        ["user", "assistant"].includes(message.role) &&
+        typeof message.content === "string"
       )
-      .map(m => {
-        if (typeof m.content === "string") {
-          return {
-            role: m.role,
-            content: m.content.slice(0, 12000)
-          };
-        }
-
-        if (!Array.isArray(m.content)) {
-          return null;
-        }
-
-        const content = m.content
-          .map(item => {
-            if (!item || typeof item !== "object") {
-              return null;
-            }
-
-            // Text
-            if (
-              item.type === "input_text" &&
-              typeof item.text === "string"
-            ) {
-              return {
-                type: "input_text",
-                text: item.text.slice(0, 12000)
-              };
-            }
-
-            // Images and video frames
-            if (
-              m.role === "user" &&
-              item.type === "input_image" &&
-              typeof item.image_url === "string" &&
-              item.image_url.length <= 4000000 &&
-              /^https:\/\//.test(item.image_url) ||
-              (
-                m.role === "user" &&
-                item.type === "input_image" &&
-                typeof item.image_url === "string" &&
-                item.image_url.length <= 4000000 &&
-                /^data:image\/(jpeg|jpg|png|webp);base64,/.test(item.image_url)
-              )
-            ) {
-              return {
-                type: "input_image",
-                image_url: item.image_url,
-                detail: "auto"
-              };
-            }
-
-            // Documents
-            if (
-              m.role === "user" &&
-              item.type === "input_file" &&
-              typeof item.file_data === "string" &&
-              item.file_data.length <= 3500000 &&
-              typeof item.filename === "string" &&
-              /\.(pdf|txt|md|docx|pptx)$/i.test(item.filename) &&
-              /^data:[^;]+;base64,/.test(item.file_data)
-            ) {
-              return {
-                type: "input_file",
-                filename: item.filename.slice(0, 150),
-                file_data: item.file_data
-              };
-            }
-
-            // Audio
-            if (
-              m.role === "user" &&
-              item.type === "input_audio" &&
-              typeof item.data === "string" &&
-              item.data.length <= 3500000 &&
-              ["mp3", "wav"].includes(item.format)
-            ) {
-              return {
-                type: "input_audio",
-                input_audio: {
-                  data: item.data,
-                  format: item.format
-                }
-              };
-            }
-
-            return null;
-          })
-          .filter(Boolean);
-
-        if (!content.length) {
-          return null;
-        }
-
-        return {
-          role: m.role,
-          content
-        };
-      })
-      .filter(Boolean);
+      .map(message => ({
+        role: message.role,
+        content: message.content.slice(0, 4000)
+      }));
 
     if (!safeMessages.length) {
+      return send(400, { error: "No valid messages found." });
+    }
+
+    /* PREPARE CONVERSATION */
+
+    const input = safeMessages.map(message => ({
+      role: message.role,
+      content: message.role === "user"
+        ? [{ type: "input_text", text: message.content }]
+        : message.content
+    }));
+
+    const lastUserMessage = [...input]
+      .reverse()
+      .find(message => message.role === "user");
+
+    if (!lastUserMessage) {
+      return send(400, { error: "A user message is required." });
+    }
+
+    /* PROCESS ATTACHMENTS */
+
+    for (const file of attachments) {
+      if (
+        !file ||
+        typeof file.name !== "string" ||
+        typeof file.type !== "string" ||
+        typeof file.data !== "string"
+      ) {
+        return send(400, { error: "An attachment is invalid." });
+      }
+
+      if (
+        file.data.length > 5_000_000 ||
+        !/^[A-Za-z0-9+/]*={0,2}$/.test(file.data)
+      ) {
+        return send(400, { error: "An attachment is too large or invalid." });
+      }
+
+      const buffer = Buffer.from(file.data, "base64");
+
+      if (!buffer.length || buffer.length > 4 * 1024 * 1024) {
+        return send(400, {
+          error: "Each attachment must be no larger than 4 MB."
+        });
+      }
+
+      const mime = file.type.toLowerCase();
+      const filename = file.name.slice(0, 150);
+
+      /* IMAGES */
+
+      if (mime.startsWith("image/")) {
+        const allowedImages = [
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "image/gif"
+        ];
+
+        if (!allowedImages.includes(mime)) {
+          return send(400, {
+            error: "Please use a JPG, PNG, WEBP or GIF image."
+          });
+        }
+
+        lastUserMessage.content.push({
+          type: "input_image",
+          image_url: `data:${mime};base64,${file.data}`,
+          detail: "auto"
+        });
+
+        continue;
+      }
+
+      /* PDF DOCUMENTS */
+
+      if (mime === "application/pdf" || /\.pdf$/i.test(filename)) {
+        lastUserMessage.content.push({
+          type: "input_file",
+          filename,
+          file_data: `data:application/pdf;base64,${file.data}`
+        });
+
+        continue;
+      }
+
+      /* TEXT AND CSV DOCUMENTS */
+
+      if (
+        mime.startsWith("text/") ||
+        /\.(txt|csv)$/i.test(filename)
+      ) {
+        const textContent = buffer.toString("utf8").slice(0, 30000);
+
+        lastUserMessage.content.push({
+          type: "input_text",
+          text: `\n\nUploaded document: ${filename}\n${textContent}`
+        });
+
+        continue;
+      }
+
+      /* AUDIO RECORDINGS */
+
+      if (mime.startsWith("audio/")) {
+        const allowedAudio = [
+          "audio/webm",
+          "audio/wav",
+          "audio/x-wav",
+          "audio/mpeg",
+          "audio/mp3",
+          "audio/mp4",
+          "audio/m4a",
+          "audio/ogg",
+          "audio/mpga"
+        ];
+
+        if (!allowedAudio.includes(mime)) {
+          return send(400, {
+            error: "This audio format is not supported."
+          });
+        }
+
+        const form = new FormData();
+
+        const audioBlob = new Blob([buffer], {
+          type: mime
+        });
+
+        form.append("file", audioBlob, filename);
+        form.append("model", "gpt-4o-mini-transcribe");
+
+        const transcriptionResponse = await fetch(
+          "https://api.openai.com/v1/audio/transcriptions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${openaiKey}`
+            },
+            body: form
+          }
+        );
+
+        const transcription = await transcriptionResponse.json();
+
+        if (!transcriptionResponse.ok) {
+          console.error("Transcription error:", transcription);
+          return send(502, {
+            error: "KI's could not transcribe that audio."
+          });
+        }
+
+        lastUserMessage.content.push({
+          type: "input_text",
+          text: `\n\nAudio recording transcript:\n${String(
+            transcription.text || ""
+          ).slice(0, 12000)}`
+        });
+
+        continue;
+      }
+
       return send(400, {
-        error: "No valid messages found."
+        error: `This file type is not supported: ${filename}`
       });
     }
 
-    // Send request to OpenAI
-    const response = await fetch(
+    /* ASK KI'S */
+
+    const aiResponse = await fetch(
       "https://api.openai.com/v1/responses",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`
+          Authorization: `Bearer ${openaiKey}`
         },
         body: JSON.stringify({
           model: "gpt-5.5",
-          instructions: KI_IDENTITY,
-          input: safeMessages,
-          max_output_tokens: 1200
+          store: false,
+          instructions:
+            "You are KI's, short for Khalffs Intelligence, created by Alexander Olaoluwa. " +
+            "You are a friendly, intelligent, respectful and helpful AI assistant. " +
+            "Help users learn, understand questions, work with documents and images, " +
+            "and explore ideas. Be honest about your capabilities. " +
+            "Never claim to have examined an attachment unless it was actually provided. " +
+            "When a user provides an image or document, carefully use its contents " +
+            "when answering. Keep answers clear and useful.",
+          input,
+          max_output_tokens: 1000
         })
       }
     );
 
-    const data = await response.json();
+    const result = await aiResponse.json();
 
-    if (!response.ok) {
-      console.error("OpenAI error:", data);
-
+    if (!aiResponse.ok) {
+      console.error("OpenAI response error:", result);
       return send(502, {
-        error: "KI's could not answer. Please try again."
+        error: "KI's AI service could not answer. Please try again."
       });
     }
 
-    const reply = (data.output || [])
+    const reply = (result.output || [])
       .flatMap(item => item.content || [])
       .filter(item => item.type === "output_text")
       .map(item => item.text)
       .join("\n");
 
     return send(200, {
-      reply: reply ||
-        "KI's couldn't produce a reply. Please try again."
+      reply: reply || "I couldn't produce a reply. Please try again."
     });
 
   } catch (error) {
-    console.error("KI function error:", error);
+    console.error("KI's server error:", error);
 
     return send(500, {
       error: "Something went wrong. Please try again."
