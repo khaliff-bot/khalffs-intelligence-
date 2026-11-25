@@ -2,526 +2,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KI's - Khalffs Intelligence</title>
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background: #090d18;
-  color: #fff;
-  min-height: 100vh;
-}
-
-.app {
-  display: flex;
-  min-height: 100vh;
-}
-
-.sidebar {
-  width: 260px;
-  background: #0d1424;
-  padding: 25px 18px;
-  border-right: 1px solid #1d2a40;
-}
-
-.logo {
-  font-size: 25px;
-  font-weight: bold;
-  color: #61a9ff;
-  margin-bottom: 35px;
-}
-
-.logo span {
-  color: white;
-}
-
-.new-chat {
-  width: 100%;
-  padding: 14px;
-  background: #17243a;
-  border: 1px solid #31517d;
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.sidebar p {
-  margin-top: 30px;
-  color: #78869d;
-  font-size: 13px;
-}
-
-.main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.header {
-  height: 75px;
-  padding: 20px 30px;
-  border-bottom: 1px solid #1d2a40;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.header h2 {
-  font-size: 18px;
-}
-
-.status {
-  color: #5be0a0;
-  font-size: 12px;
-}
-
-.chat-area {
-  flex: 1;
-  width: 100%;
-  max-width: 900px;
-  margin: auto;
-  padding: 35px 25px;
-  display: flex;
-  flex-direction: column;
-}
-
-.welcome {
-  text-align: center;
-  margin: auto auto 35px;
-}
-
-.robot {
-  width: 85px;
-  height: 85px;
-  margin: 0 auto 22px;
-  border-radius: 25px;
-  background: linear-gradient(135deg,#102f60,#126ed1);
-  box-shadow: 0 0 35px #126ed155;
-  display: grid;
-  place-items: center;
-  font-size: 43px;
-}
-
-.welcome h1 {
-  font-size: 30px;
-  margin-bottom: 12px;
-}
-
-.welcome h1 span {
-  color: #58aaff;
-}
-
-.welcome p {
-  color: #94a4bc;
-  line-height: 1.7;
-}
-
-#chat-messages {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding-bottom: 25px;
-}
-
-#chat-messages:empty {
-  display: none;
-}
-
-#chat-messages > * {
-  line-height: 1.7;
-}
-
-#chat-form {
-  display: flex;
-  gap: 10px;
-  padding: 12px;
-  background: #121d30;
-  border: 1px solid #2a3e5d;
-  border-radius: 16px;
-  box-shadow: 0 0 25px #1674d015;
-}
-
-#chat-input {
-  flex: 1;
-  min-width: 0;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: white;
-  font-size: 15px;
-  padding: 10px;
-}
-
-#chat-input::placeholder {
-  color: #788ba8;
-}
-
-#send-button {
-  background: #2685ed;
-  color: white;
-  border: none;
-  border-radius: 11px;
-  padding: 12px 19px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-#send-button:hover {
-  background: #4a9cff;
-}
-
-.footer {
-  text-align: center;
-  color: #63738c;
-  font-size: 11px;
-  padding: 18px;
-}
-
-@media(max-width:700px) {
-  .sidebar {
-    display: none;
-  }
-
-  .header {
-    padding: 18px;
-  }
-
-  .chat-area {
-    padding: 25px 15px;
-  }
-
-  .welcome h1 {
-    font-size: 25px;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b16">
+  <title>KI's — Khalffs Intelligence</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
-<div class="app">
 
-  <aside class="sidebar">
-    <div class="logo">KI's<span>.</span></div>
-    <button class="new-chat" id="new-chat" type="button">
-      + New Chat
-    </button>
-    <p>KHALFFS INTELLIGENCE</p>
-  </aside>
-
-  <main class="main">
-
-    <header class="header">
-      <h2>KI's Intelligence</h2>
-      <span class="status">● Online</span>
-    </header>
-
-    <section class="chat-area">
-
-      <div class="welcome">
-        <div class="robot">🤖</div>
-        <h1>Welcome to <span>KI's</span></h1>
-        <p>
-          Your intelligent assistant.<br>
-          Ask questions, explore ideas and discover possibilities.
-        </p>
+  <!-- LOGIN AND SIGNUP -->
+  <section id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+      <div class="brand">
+        <div class="brand-logo">KI</div>
+        <h1>KI's</h1>
+        <p>Khalffs Intelligence</p>
       </div>
 
-      <div id="chat-messages"></div>
+      <h2>Welcome to KI's</h2>
+      <p class="auth-description">Your intelligent assistant, ready to help.</p>
 
-      <form id="chat-form">
+      <div class="auth-tabs">
+        <button type="button" id="login-tab" class="active">Log in</button>
+        <button type="button" id="signup-tab">Create account</button>
+      </div>
+
+      <form id="auth-form">
+        <label for="auth-email">Email address</label>
         <input
-          type="text"
-          id="chat-input"
-          placeholder="Ask KI's anything..."
-          autocomplete="off"
+          id="auth-email"
+          type="email"
+          placeholder="Enter your email"
+          autocomplete="email"
           required
         >
-        <button type="submit" id="send-button">
-          Send ➤
+
+        <label for="auth-password">Password</label>
+        <input
+          id="auth-password"
+          type="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          minlength="6"
+          required
+        >
+
+        <button type="submit" id="auth-submit" class="primary-button">
+          Log in
         </button>
       </form>
 
-      <div class="footer">
-        KI's – Khalffs Intelligence
+      <p id="auth-note" class="auth-note">
+        Log in or create your account to continue.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- MAIN APPLICATION -->
+  <main id="app" class="app hidden">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-mini">
+          <div class="brand-logo">KI</div>
+          <div>
+            <strong>KI's</strong>
+            <small>Khalffs Intelligence</small>
+          </div>
+        </div>
+
+        <button id="theme-toggle" class="icon-button" type="button" title="Change theme">
+          ☼
+        </button>
+      </div>
+
+      <button id="new-chat" class="new-chat-button" type="button">
+        <span>＋</span> New chat
+      </button>
+
+      <p class="sidebar-label">YOUR CHATS</p>
+      <div id="chat-list" class="chat-list"></div>
+
+      <div class="sidebar-bottom">
+        <div class="account-info">
+          <div class="account-avatar">K</div>
+          <div class="account-details">
+            <strong>KI's Account</strong>
+            <small id="user-email"></small>
+          </div>
+        </div>
+
+        <button id="mobile-theme" class="secondary-button" type="button">
+          Toggle theme
+        </button>
+
+        <button id="logout" class="logout-button" type="button">
+          Log out
+        </button>
+      </div>
+    </aside>
+
+
+    <!-- CHAT AREA -->
+    <section id="chat-area" class="chat-area">
+
+      <header class="topbar">
+        <button id="menu-toggle" class="icon-button" type="button" title="Open menu">
+          ☰
+        </button>
+
+        <div class="topbar-brand">
+          <strong>KI's</strong>
+          <span>AI Assistant</span>
+        </div>
+
+        <div class="status-indicator">
+          <span></span> Online
+        </div>
+      </header>
+
+
+      <!-- WELCOME SCREEN -->
+      <div id="welcome" class="welcome">
+        <div class="welcome-logo">
+          <div class="robot-face">
+            <div class="robot-eyes">
+              <span></span>
+              <span></span>
+            </div>
+            <div class="robot-mouth"></div>
+          </div>
+        </div>
+
+        <h1>How can I help you today?</h1>
+        <p>Ask KI's anything. Let's make something amazing.</p>
+
+        <div class="suggestion-list">
+          <div class="suggestion">
+            <span>✦</span>
+            <p>Help me learn something new</p>
+          </div>
+          <div class="suggestion">
+            <span>✧</span>
+            <p>Help me with ideas and creativity</p>
+          </div>
+          <div class="suggestion">
+            <span>⌘</span>
+            <p>Help me solve a problem</p>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- MESSAGES -->
+      <div id="chat-messages" class="chat-messages"></div>
+
+
+      <!-- MESSAGE INPUT -->
+      <div class="composer-area">
+        <form id="chat-form" class="chat-form">
+          <textarea
+            id="chat-input"
+            rows="1"
+            placeholder="Message KI's..."
+            autocomplete="off"
+            required
+          ></textarea>
+
+          <button id="send-button" type="submit" title="Send message">
+            ↑
+          </button>
+        </form>
+
+        <p class="disclaimer">
+          KI's can make mistakes. Check important information.
+        </p>
       </div>
 
     </section>
   </main>
-</div>
 
-<script src="/app.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KI's - Khalffs Intelligence</title>
 
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background: #090d18;
-  color: #fff;
-  min-height: 100vh;
-}
-
-.app {
-  display: flex;
-  min-height: 100vh;
-}
-
-.sidebar {
-  width: 260px;
-  background: #0d1424;
-  padding: 25px 18px;
-  border-right: 1px solid #1d2a40;
-}
-
-.logo {
-  font-size: 25px;
-  font-weight: bold;
-  color: #61a9ff;
-  margin-bottom: 35px;
-}
-
-.logo span {
-  color: white;
-}
-
-.new-chat {
-  width: 100%;
-  padding: 14px;
-  background: #17243a;
-  border: 1px solid #31517d;
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.sidebar p {
-  margin-top: 30px;
-  color: #78869d;
-  font-size: 13px;
-}
-
-.main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.header {
-  height: 75px;
-  padding: 20px 30px;
-  border-bottom: 1px solid #1d2a40;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.header h2 {
-  font-size: 18px;
-}
-
-.status {
-  color: #5be0a0;
-  font-size: 12px;
-}
-
-.chat-area {
-  flex: 1;
-  width: 100%;
-  max-width: 900px;
-  margin: auto;
-  padding: 35px 25px;
-  display: flex;
-  flex-direction: column;
-}
-
-.welcome {
-  text-align: center;
-  margin: auto auto 35px;
-}
-
-.robot {
-  width: 85px;
-  height: 85px;
-  margin: 0 auto 22px;
-  border-radius: 25px;
-  background: linear-gradient(135deg,#102f60,#126ed1);
-  box-shadow: 0 0 35px #126ed155;
-  display: grid;
-  place-items: center;
-  font-size: 43px;
-}
-
-.welcome h1 {
-  font-size: 30px;
-  margin-bottom: 12px;
-}
-
-.welcome h1 span {
-  color: #58aaff;
-}
-
-.welcome p {
-  color: #94a4bc;
-  line-height: 1.7;
-}
-
-#chat-messages {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding-bottom: 25px;
-}
-
-#chat-messages:empty {
-  display: none;
-}
-
-#chat-messages > * {
-  line-height: 1.7;
-}
-
-#chat-form {
-  display: flex;
-  gap: 10px;
-  padding: 12px;
-  background: #121d30;
-  border: 1px solid #2a3e5d;
-  border-radius: 16px;
-  box-shadow: 0 0 25px #1674d015;
-}
-
-#chat-input {
-  flex: 1;
-  min-width: 0;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: white;
-  font-size: 15px;
-  padding: 10px;
-}
-
-#chat-input::placeholder {
-  color: #788ba8;
-}
-
-#send-button {
-  background: #2685ed;
-  color: white;
-  border: none;
-  border-radius: 11px;
-  padding: 12px 19px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-#send-button:hover {
-  background: #4a9cff;
-}
-
-.footer {
-  text-align: center;
-  color: #63738c;
-  font-size: 11px;
-  padding: 18px;
-}
-
-@media(max-width:700px) {
-  .sidebar {
-    display: none;
-  }
-
-  .header {
-    padding: 18px;
-  }
-
-  .chat-area {
-    padding: 25px 15px;
-  }
-
-  .welcome h1 {
-    font-size: 25px;
-  }
-}
-</style>
-</head>
-
-<body>
-<div class="app">
-
-  <aside class="sidebar">
-    <div class="logo">KI's<span>.</span></div>
-    <button class="new-chat" onclick="location.reload()">
-      + New Chat
-    </button>
-    <p>KHALFFS INTELLIGENCE</p>
-  </aside>
-
-  <main class="main">
-
-    <header class="header">
-      <h2>KI's Intelligence</h2>
-      <span class="status">● Online</span>
-    </header>
-
-    <section class="chat-area">
-
-      <div class="welcome">
-        <div class="robot">🤖</div>
-        <h1>Welcome to <span>KI's</span></h1>
-        <p>
-          Your intelligent assistant.<br>
-          Ask questions, explore ideas and discover possibilities.
-        </p>
-      </div>
-
-      <div id="chat-messages"></div>
-
-      <form id="chat-form">
-        <input
-          type="text"
-          id="chat-input"
-          placeholder="Ask KI's anything..."
-          autocomplete="off"
-          required
-        >
-        <button type="submit" id="send-button">
-          Send ➤
-        </button>
-      </form>
-
-      <div class="footer">
-        KI's – Khalffs Intelligence
-      </div>
-
-    </section>
-  </main>
-</div>
-
-<script src="/app.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>
